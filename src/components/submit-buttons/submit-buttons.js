@@ -4,15 +4,14 @@ import styles from './submit-buttons.module.css';
 
 export class SubmitButtons extends Component {
     render() {
-        const {onClick, isSubmitting} = this.props;
+        const {submit} = this.props;
 
         return (
           <div className={styles.root}>
               <Button
                 variant="contained"
                 color="primary"
-                onClick={onClick}
-                disabled={isSubmitting}
+                onClick={submit}
                 className={styles.button}
               >
                   Save with validation
@@ -20,8 +19,7 @@ export class SubmitButtons extends Component {
               <Button
                 variant="contained"
                 color="primary"
-                onClick={onClick}
-                disabled={isSubmitting}
+                onClick={submit}
                 className={styles.button}
               >
                   Save without validation
@@ -29,8 +27,7 @@ export class SubmitButtons extends Component {
               <Button
                 variant="contained"
                 color="primary"
-                onClick={onClick}
-                disabled={isSubmitting}
+                onClick={submit}
                 className={styles.button}
               >
                   Save with server error

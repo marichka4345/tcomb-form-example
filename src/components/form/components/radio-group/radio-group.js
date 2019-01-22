@@ -1,34 +1,43 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Field} from 'formik';
-import RadioGroupControl from '../../../common/radio-group/radio-group';
-import {OPTIONS} from '../../../../constants/options';
+import FormLabel from '@material-ui/core/FormLabel/FormLabel';
+import FormControlLabel from '@material-ui/core/FormControlLabel/FormControlLabel';
+import Radio from '@material-ui/core/Radio/Radio';
+import MuiRadioGroup from '@material-ui/core/RadioGroup';
+import FormControl from '@material-ui/core/FormControl/FormControl';
 
-export const RadioGroup = ({name, hasError, groupName}) => {
-    const renderRadioGroup = ({field}) => {
-        const controlProps = {
-            field,
-            hasError,
-            groupName,
-            values: OPTIONS
-        };
-        return (<RadioGroupControl {...controlProps} />);
-    };
-
+export const RadioGroup = ({name, groupName, options, value, renderError, error, onChange}) => {
     return (
-      <Field
-        name={name}
-        render={renderRadioGroup}
-      />
+      <FormControl>
+          <FormLabel>{groupName}</FormLabel>
+          <MuiRadioGroup name={name} value={value} onChange={e => onChange(e.target.value)}>
+              {
+                  options.map(({id, value: label}) => (
+                    <FormControlLabel
+                      key={id}
+                      control={<Radio color="primary" />}
+                      label={label}
+                      value={String(id)}
+                    />
+                  ))
+              }
+          </MuiRadioGroup>
+
+          {renderError(error)}
+      </FormControl>
     );
 };
 
 RadioGroup.propTypes = {
     name: PropTypes.string.isRequired,
-    hasError: PropTypes.bool,
-    groupName: PropTypes.string.isRequired
+    value: PropTypes.string.isRequired,
+    groupName: PropTypes.string.isRequired,
+    options: PropTypes.array.isRequired,
+    renderError: PropTypes.func.isRequired,
+    error: PropTypes.string,
+    onChange: PropTypes.func.isRequired
 };
 
 RadioGroup.defaultProps = {
-    hasError: false
+    error: ''
 };

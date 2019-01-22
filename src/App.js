@@ -14,12 +14,20 @@ const jss = create({
 });
 
 export default class App extends Component {
+    form = React.createRef();
+
+    submit = e => {
+        e.preventDefault();
+
+        console.log(this.form.current.getValue());
+    };
+
     render() {
         return (
           <JssProvider jss={jss} generateClassName={generateClassName}>
               <Fragment>
-                  <SubmitButtons />
-                  <TestForm />
+                  <SubmitButtons submit={this.submit} />
+                  <TestForm ref={this.form} />
               </Fragment>
           </JssProvider>
     );

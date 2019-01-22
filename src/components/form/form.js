@@ -1,41 +1,38 @@
 import React, {Component} from 'react';
 import t from 'tcomb-form';
 
-import {VALIDATION_SCHEMA, FORM_OPTIONS, INITIAL_VALUES} from './constants/form-config';
+import {VALIDATION_SCHEMA, getFormOptions, INITIAL_VALUES} from './constants/form-config';
+
+import styles from './form.module.css';
 
 const Form = t.form.Form;
 
 
-export class TestForm  extends Component {
-    form = React.createRef();
-
+export class FormBase  extends Component {
     state = {
-        value: INITIAL_VALUES
+        value: INITIAL_VALUES,
+        options: getFormOptions(styles.error)
     };
 
     onChange = (value) => {
-        console.log(value);
         this.setState({value});
     };
 
     render() {
-        console.log(this.form.current);
+        const {form} = this.props;
 
         return (
-          <form onSubmit={(e) => {
-              e.preventDefault();
-              console.log(this.form.current.getValue());
-          }}>
+          <form>
               <Form
-                ref={this.form}
+                ref={form}
                 type={VALIDATION_SCHEMA}
-                options={FORM_OPTIONS}
+                options={this.state.options}
                 value={this.state.value}
                 onChange={this.onChange}
               />
-
-              <button type="submit">Submit</button>
           </form>
         );
     }
-};
+}
+
+export const TestForm = React.forwardRef((props, ref) => <FormBase form={ref} {...props} />);

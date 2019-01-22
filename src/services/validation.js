@@ -1,38 +1,7 @@
 import t from 'tcomb-form';
 import {text} from '../constants/validation-regexps';
-import * as FIELDS from "../constants/form-fields";
-
-const ERROR = {
-    MIN: 'min',
-    MAX: 'max',
-    MATCH: 'match',
-    REQUIRED: 'required'
-};
-
-const ERROR_MESSAGES = {
-    [FIELDS.TEXT1]: {
-        [ERROR.MIN]: 'Text1 should have minimum 2 symbols',
-        [ERROR.MAX]: 'Text1 should have maximum 100 symbols',
-        [ERROR.MATCH]: 'Text1 should not have special symbols at start/end',
-        [ERROR.REQUIRED]: 'Text1 is required'
-    },
-    [FIELDS.DROPDOWN1]: {
-        [ERROR.REQUIRED]: 'Dropdown1 is required'
-    },
-    [FIELDS.AUTOCOMPLETE1]: {
-        [ERROR.REQUIRED]: 'Autocomplete1 is required'
-    },
-    [FIELDS.AUTOCOMPLETE2]: {
-        [ERROR.MIN]: 'You should choose at least 2 values',
-        [ERROR.MAX]: 'You should choose maximum 5 values',
-        [ERROR.REQUIRED]: 'Autocomplete2 is required'
-    },
-    [FIELDS.DRAFTJS]: {
-        [ERROR.MIN]: 'You should enter minimum 5 symbols',
-        [ERROR.MAX]: 'You should enter less than 100 symbols'
-
-    }
-};
+import {ERROR, ERROR_MESSAGES} from '../constants/errors';
+import * as FIELDS from '../constants/form-fields';
 
 const min = number => value => {
     return value.length > number;
@@ -48,12 +17,12 @@ const matches = regexp => value => {
 
 const required = value => !!value;
 
-export const minDraftJs = number => value => {
+const minDraftJs = number => value => {
     const text = value.getCurrentContent().getPlainText('');
     return text.length > number;
 };
 
-export const maxDraftJs = number => value => {
+const maxDraftJs = number => value => {
     const text = value.getCurrentContent().getPlainText('');
     return text.length < number;
 };
@@ -83,34 +52,37 @@ const FIELD_VALIDATIONS = {
     [FIELDS.DRAFTJS]: {
         [ERROR.MIN]: minDraftJs(5),
         [ERROR.MAX]: maxDraftJs(100)
+    },
+    [FIELDS.RADIOGROUP1]: {
+        [ERROR.REQUIRED]: required
     }
 };
 
-export const validate = (name) => {
-    const fieldValidations = Object.keys(ERROR_MESSAGES[name]);
-    const validations = fieldValidations.reduce(
+export const validate = name => {
+    const fieldChecks = Object.keys(ERROR_MESSAGES[name]).reduce(
       (result, validation) => ({...result, [validation]: true}),
       {}
     );
 
      const controlType = t.refinement(t.Any, value => {
+         if (!value) {value = ''}
+
          const fieldValidations = FIELD_VALIDATIONS[name];
          Object.entries(fieldValidations).forEach(([error, validate]) => {
-             validations[error] = validate(value);
+             fieldChecks[error] = validate(value);
          });
 
-         return Object.values(validations).every(validation => validation);
+         return Object.values(fieldChecks).every(isValid => isValid);
      });
 
     controlType.getValidationErrorMessage = () => {
-        const errorMessages = ERROR_MESSAGES[FIELDS.TEXT1];
+        const errorMessages = ERROR_MESSAGES[name];
 
-        console.log(validations);
-
-        const error = Object.entries(validations).find(([error, validation]) => !validation);
+        const error = Object.entries(fieldChecks).find(([error, validation]) => !validation);
         const errorName = error && error[0];
+
         return errorMessages[errorName];
     };
 
-     return controlType;
+    return controlType;
 };

@@ -2,7 +2,7 @@ import React, {Fragment} from 'react';
 import PropTypes from 'prop-types';
 import TextField from '@material-ui/core/TextField/TextField';
 
-export const TextInput  = ({name, value, hasError, onChange, error, renderError}) => {
+export const TextInput  = ({name, value, onChange, error, renderError}) => {
     const change = e => {
         const value = e.target.value;
         onChange(value);
@@ -13,7 +13,7 @@ export const TextInput  = ({name, value, hasError, onChange, error, renderError}
           <TextField
             onChange={e => change(e)}
             value={value}
-            error={hasError}
+            error={!!error}
             label={name}
           />
 
@@ -25,6 +25,5 @@ export const TextInput  = ({name, value, hasError, onChange, error, renderError}
 TextInput.propTypes = {
     name: PropTypes.string.isRequired,
     value: PropTypes.string.isRequired,
-    hasError: PropTypes.bool.isRequired,
     renderError: PropTypes.func.isRequired
 };
