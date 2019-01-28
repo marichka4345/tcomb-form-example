@@ -7,7 +7,7 @@ import FormControl from '@material-ui/core/FormControl/FormControl';
 
 export const Dropdown = ({name, value, onChange, error, renderError, options}) => {
     return (
-      <FormControl>
+      <FormControl margin="dense">
           <InputLabel>{name}</InputLabel>
 
           <Select error={!!error} value={value} onChange={e => onChange(String(e.target.value))}>

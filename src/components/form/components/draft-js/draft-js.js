@@ -71,9 +71,9 @@ export class DraftJs extends Component {
     };
 
     render() {
-        const {name, value, hasError, error, renderError} = this.props;
+        const {name, value, error, renderError} = this.props;
 
-        const errorClass = hasError ? styles.error : '';
+        const errorClass = !!error ? styles.error : '';
 
         return (
           <Fragment>
@@ -104,7 +104,6 @@ export class DraftJs extends Component {
 DraftJs.propTypes = {
     name: PropTypes.string.isRequired,
     value: PropTypes.any.isRequired,
-    hasError: PropTypes.bool.isRequired,
     onChange: PropTypes.func.isRequired,
     error: PropTypes.string,
     renderError: PropTypes.func.isRequired

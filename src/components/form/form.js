@@ -1,38 +1,138 @@
 import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 import t from 'tcomb-form';
-
-import {VALIDATION_SCHEMA, getFormOptions, INITIAL_VALUES} from './constants/form-config';
-
+import {VALIDATION_SCHEMA, INITIAL_VALUES, getFormOptions} from './constants/form-config';
+import {SubmitButtons} from '../submit-buttons/submit-buttons';
+import {getServerError, sleep} from '../../services/helpers';
+import {TEXT1, TEXT2} from '../../constants/form-fields';
 import styles from './form.module.css';
 
 const Form = t.form.Form;
 
+const renderError = error =>
+  (error && <div className={styles.error}>{error}</div>);
 
-export class FormBase  extends Component {
+export class TestForm  extends Component {
     state = {
         value: INITIAL_VALUES,
-        options: getFormOptions(styles.error)
+        options: getFormOptions(renderError),
+        isSubmitting: false
     };
 
-    onChange = (value) => {
-        this.setState({value});
+    formRef = React.createRef();
+
+    onChange = value => {
+        let {options} = this.state;
+
+        const text1 = value[TEXT1];
+        const text2 = value[TEXT2];
+
+        if (text2 && text2 !== text1) {
+            options = t.update(this.state.options, {fields: {
+                    [TEXT2]: {
+                        error: {'$set': 'Text2 should match text1'},
+                        hasError: {'$set': true}
+                    }
+                }
+            });
+        } else {
+            options = t.update(this.state.options, {fields: {
+                    [TEXT2]: {
+                        error: {'$set': ''},
+                        hasError: {'$set': false}
+                    }
+                }
+            });
+        }
+
+        this.setState({
+            value,
+            options
+        });
+    };
+
+    submit = async e => {
+        e.preventDefault();
+
+        this.setState({isSubmitting: true});
+
+        const values = this.formRef.current.getValue();
+        await sleep(1000);
+        if (values) {
+            alert('submitted');
+            console.log(values);
+        }
+
+        this.setState({isSubmitting: false});
+    };
+
+    submitWithoutValidation = async e => {
+        e.preventDefault();
+
+        this.setState({isSubmitting: true});
+
+        const {value} = this.state;
+        await sleep(1000);
+        alert('submitted');
+        console.log(value);
+
+        this.setState({isSubmitting: false});
+    };
+
+    submitWithServerError = async e => {
+        e.preventDefault();
+
+        this.setState({isSubmitting: true});
+
+        const values = this.formRef.current.getValue();
+
+        alert('submitted');
+        console.log(values);
+
+        if (values && values[TEXT1] !== 'sun') {
+            const errors = await getServerError([TEXT1]);
+
+            this.setState({
+                options: t.update(this.state.options, {fields: {
+                        [TEXT1]: {
+                            error: {'$set': errors[TEXT1]},
+                            hasError: {'$set': true}
+                        }
+                    }
+                }),
+                isSubmitting: false
+            });
+            return;
+        }
+
+        this.setState({isSubmitting: false});
     };
 
     render() {
-        const {form} = this.props;
+        const {portalSelector} = this.props;
 
         return (
-          <form>
+          <form className={styles.fields}>
               <Form
-                ref={form}
+                ref={this.formRef}
                 type={VALIDATION_SCHEMA}
                 options={this.state.options}
                 value={this.state.value}
                 onChange={this.onChange}
+              />
+
+              <SubmitButtons
+                portalSelector={portalSelector}
+                isSubmitting={this.state.isSubmitting}
+                submit={this.submit}
+                submitWithoutValidation={this.submitWithoutValidation}
+                submitWithServerError={this.submitWithServerError}
               />
           </form>
         );
     }
 }
 
-export const TestForm = React.forwardRef((props, ref) => <FormBase form={ref} {...props} />);
+TestForm.propTypes = {
+    portalSelector: PropTypes.string.isRequired
+};

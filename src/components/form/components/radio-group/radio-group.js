@@ -8,7 +8,7 @@ import FormControl from '@material-ui/core/FormControl/FormControl';
 
 export const RadioGroup = ({name, groupName, options, value, renderError, error, onChange}) => {
     return (
-      <FormControl>
+      <FormControl margin="dense">
           <FormLabel>{groupName}</FormLabel>
           <MuiRadioGroup name={name} value={value} onChange={e => onChange(e.target.value)}>
               {

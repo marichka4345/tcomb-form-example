@@ -13,50 +13,48 @@ import {DraftJs} from '../components/draft-js/draft-js';
 import {RadioGroup} from '../components/radio-group/radio-group';
 import {Switch} from '../components/switch/switch';
 
-export const getFormOptions = errorClass => {
-    const renderError = error =>
-      (error && <div className={errorClass}>{error}</div>);
+export const getFormOptions = renderError => {
+    const getControlTemplate = (Control, name, controlProps) => locals =>
+      <Control name={name} renderError={renderError} {...locals} {...controlProps} />;
 
     return {
         fields: {
             [FIELDS.TEXT1]: {
-                template: (locals) => <TextInput name={FIELDS.TEXT1} {...locals} renderError={renderError} />
+                template: getControlTemplate(TextInput, FIELDS.TEXT1)
             },
             [FIELDS.TEXT2]: {
-                template: (locals) => <TextInput name={FIELDS.TEXT2} {...locals} renderError={renderError} />
+                template: getControlTemplate(TextInput, FIELDS.TEXT2)
             },
             [FIELDS.DROPDOWN1]: {
-                template: (locals) => <Dropdown name={FIELDS.DROPDOWN1} {...locals} renderError={renderError}options={OPTIONS} />
+                template: getControlTemplate(Dropdown, FIELDS.DROPDOWN1, {options: OPTIONS})
             },
             [FIELDS.DROPDOWN2]: {
-                template: (locals) => <Dropdown name={FIELDS.DROPDOWN2} {...locals} renderError={renderError} options={OPTIONS} />
+                template: getControlTemplate(Dropdown, FIELDS.DROPDOWN2, {options: OPTIONS})
             },
             [FIELDS.AUTOCOMPLETE1]: {
-                template: (locals) => <Autocomplete name={FIELDS.AUTOCOMPLETE1} {...locals} renderError={renderError} />
+                template: getControlTemplate(Autocomplete, FIELDS.AUTOCOMPLETE1)
             },
             [FIELDS.AUTOCOMPLETE2]: {
-                template: (locals) =>
-                  <Autocomplete
-                    name={FIELDS.AUTOCOMPLETE2}
-                    autocompleteType={AUTOCOMPLETE_TYPE.MULTI}
-                    {...locals}
-                    renderError={renderError}
-                  />
+                template:
+                  getControlTemplate(
+                    Autocomplete,
+                    FIELDS.AUTOCOMPLETE2,
+                    {autocompleteType: AUTOCOMPLETE_TYPE.MULTI}
+                  )
             },
             [FIELDS.DRAFTJS]: {
-                template: (locals) => <DraftJs name={FIELDS.DRAFTJS} {...locals} renderError={renderError} />
-            },
-            [FIELDS.RADIOGROUP1]: {
-                template: (locals) => <RadioGroup
-                  name={FIELDS.RADIOGROUP1}
-                  groupName="Lala"
-                  {...locals}
-                  options={OPTIONS}
-                  renderError={renderError}
-                />
+                template: getControlTemplate(DraftJs, FIELDS.DRAFTJS)
             },
             [FIELDS.TOGGLER]: {
-                template: (locals) => <Switch name={FIELDS.TOGGLER} {...locals} />
+                template: getControlTemplate(Switch, FIELDS.TOGGLER)
+            },
+            [FIELDS.RADIOGROUP1]: {
+                template:
+                  getControlTemplate(
+                    RadioGroup,
+                    FIELDS.RADIOGROUP1,
+                    {groupName: 'Radiogroup', options: OPTIONS}
+                  )
             }
         }
     }
@@ -69,10 +67,9 @@ export const INITIAL_VALUES = {
     [FIELDS.DROPDOWN2]: OPTIONS[0].id,
     [FIELDS.AUTOCOMPLETE1]: '',
     [FIELDS.AUTOCOMPLETE2]: [],
-    [FIELDS.TOGGLER]: false,
     [FIELDS.DRAFTJS]: EditorState.createEmpty(),
-    [FIELDS.RADIOGROUP1]: '',
-    [FIELDS.TOGGLER]: false
+    [FIELDS.TOGGLER]: false,
+    [FIELDS.RADIOGROUP1]: ''
 };
 
 export const VALIDATION_SCHEMA = t.struct({
@@ -82,6 +79,6 @@ export const VALIDATION_SCHEMA = t.struct({
     [FIELDS.AUTOCOMPLETE1]: validate(FIELDS.AUTOCOMPLETE1),
     [FIELDS.AUTOCOMPLETE2]: validate(FIELDS.AUTOCOMPLETE2),
     [FIELDS.DRAFTJS]: validate(FIELDS.DRAFTJS),
-    [FIELDS.RADIOGROUP1]: validate(FIELDS.RADIOGROUP1),
-    [FIELDS.TOGGLER]: t.Bool
+    [FIELDS.TOGGLER]: t.Boolean,
+    [FIELDS.RADIOGROUP1]: validate(FIELDS.RADIOGROUP1)
 });

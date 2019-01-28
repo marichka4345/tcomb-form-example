@@ -5,6 +5,7 @@ import NoSsr from '@material-ui/core/NoSsr';
 import FormControl from '@material-ui/core/FormControl';
 import Chip from '@material-ui/core/Chip';
 import CancelIcon from '@material-ui/icons/Cancel';
+import FormLabel from '@material-ui/core/FormLabel';
 import {AUTOCOMPLETE_TYPE} from '../../../../constants/autocomplete-types';
 import {OPTIONS} from '../../../../constants/options';
 
@@ -50,14 +51,17 @@ export class Autocomplete extends Component {
         const {
             autocompleteType,
             error,
-            renderError
+            renderError,
+            name
         } = this.props;
 
         return (
           <FormControl
+            margin="dense"
             fullWidth
             error={!!error}
           >
+              <FormLabel>{name}</FormLabel>
               <NoSsr>
                   <Select
                     options={options}
@@ -76,6 +80,7 @@ export class Autocomplete extends Component {
 }
 
 Autocomplete.propTypes = {
+    name: PropTypes.string.isRequired,
     autocompleteType: PropTypes.string,
     error: PropTypes.string,
     renderError: PropTypes.func.isRequired

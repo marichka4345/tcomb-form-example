@@ -4,7 +4,7 @@ import {ERROR, ERROR_MESSAGES} from '../constants/errors';
 import * as FIELDS from '../constants/form-fields';
 
 const min = number => value => {
-    return value.length > number;
+    return value.length >= number;
 };
 
 const max = number => value => {
@@ -19,16 +19,12 @@ const required = value => !!value;
 
 const minDraftJs = number => value => {
     const text = value.getCurrentContent().getPlainText('');
-    return text.length > number;
+    return text.length >= number;
 };
 
 const maxDraftJs = number => value => {
     const text = value.getCurrentContent().getPlainText('');
     return text.length < number;
-};
-
-const equal = toCompareWith => value => {
-    return value === toCompareWith;
 };
 
 const FIELD_VALIDATIONS = {
