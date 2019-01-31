@@ -1,4 +1,4 @@
-export const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 export const getServerError = (names) =>
   sleep(1000).then(() =>
@@ -7,3 +7,7 @@ export const getServerError = (names) =>
         return errors;
     }, {})
   );
+
+
+export const getServerResponse = values =>
+  sleep(1000).then(() => values);

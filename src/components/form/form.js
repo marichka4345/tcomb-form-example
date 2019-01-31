@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import t from 'tcomb-form';
 import {VALIDATION_SCHEMA, INITIAL_VALUES, getFormOptions} from './constants/form-config';
 import {SubmitButtons} from '../submit-buttons/submit-buttons';
-import {getServerError, sleep} from '../../services/helpers';
+import {getServerError, getServerResponse} from '../../services/helpers';
 import {TEXT1, TEXT2} from '../../constants/form-fields';
 import styles from './form.module.css';
 
@@ -56,11 +56,9 @@ export class TestForm  extends Component {
 
         this.setState({isSubmitting: true});
 
-        const values = this.formRef.current.getValue();
-        await sleep(1000);
-        if (values) {
-            alert('submitted');
-            console.log(values);
+        const response = await getServerResponse(this.formRef.current.getValue());
+        if (response) {
+            console.log('Submitted with ', response);
         }
 
         this.setState({isSubmitting: false});
@@ -71,10 +69,8 @@ export class TestForm  extends Component {
 
         this.setState({isSubmitting: true});
 
-        const {value} = this.state;
-        await sleep(1000);
-        alert('submitted');
-        console.log(value);
+        const response = await getServerResponse(this.state.value);
+        console.log('Submitted with ', response);
 
         this.setState({isSubmitting: false});
     };
@@ -84,25 +80,37 @@ export class TestForm  extends Component {
 
         this.setState({isSubmitting: true});
 
-        const values = this.formRef.current.getValue();
+        const response = await getServerResponse(this.formRef.current.getValue());
+        if (response) {
+            console.log('Submitted with ', response);
 
-        alert('submitted');
-        console.log(values);
+            if (response[TEXT1] !== 'sun') {
+                const errors = await getServerError([TEXT1]);
 
-        if (values && values[TEXT1] !== 'sun') {
-            const errors = await getServerError([TEXT1]);
-
-            this.setState({
-                options: t.update(this.state.options, {fields: {
-                        [TEXT1]: {
-                            error: {'$set': errors[TEXT1]},
-                            hasError: {'$set': true}
+                this.setState({
+                    options: t.update(this.state.options, {fields: {
+                            [TEXT1]: {
+                                error: {'$set': errors[TEXT1]},
+                                hasError: {'$set': true}
+                            }
                         }
-                    }
-                }),
-                isSubmitting: false
-            });
-            return;
+                    }),
+                    isSubmitting: false
+                });
+                console.log('Got error ', errors);
+                return;
+            } else {
+                this.setState({
+                    options: t.update(this.state.options, {fields: {
+                            [TEXT1]: {
+                                error: {'$set': ''},
+                                hasError: {'$set': false}
+                            }
+                        }
+                    }),
+                    isSubmitting: false
+                });
+            }
         }
 
         this.setState({isSubmitting: false});
